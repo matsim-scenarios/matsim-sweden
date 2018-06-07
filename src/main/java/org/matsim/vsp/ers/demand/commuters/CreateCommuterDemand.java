@@ -38,10 +38,7 @@ import playground.vsp.corineLandcover.CorineLandCoverData;
 import playground.vsp.corineLandcover.LandCoverUtils;
 import playground.vsp.openberlinscenario.cemdap.input.CommuterRelationV2;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
@@ -51,12 +48,14 @@ public class CreateCommuterDemand {
     public static final String COMMUTERS = "D:/ers/commuters/commuters2016.csv";
     public static final String COMMUNITYSHAPE = "D:/ers/commuters/Kommun_Sweref99TM_region.shp";
     private int agentCounter = 0;
-    private double fraction = 1.00;
+    private double fraction = 1.0;
     private List<CommuterRelationV2> commuterRelations;
     private Map<String, Geometry> communities;
     private Population population;
     private CorineLandCoverData corineLandCoverData;
     private Random random = MatsimRandom.getRandom();
+
+    private List<String> metropolitanRegions = Arrays.asList(new String[]{"0114", "0115", "1402", "0117", "1407", "0120", "0123", "0125", "0126", "0127", "0128", "0136", "0138", "0139", "1440", "0140", "1441", "0160", "0162", "0163", "0180", "0181", "0182", "0183", "0184", "0186", "0187", "0191", "0192", "1230", "1480", "1231", "1481", "1233", "1482", "1261", "1262", "1263", "1280", "1281", "1285", "1287", "1384"});
 
     public static void main(String[] args) {
         new CreateCommuterDemand().run();
@@ -90,10 +89,13 @@ public class CreateCommuterDemand {
             if (agentCounter % (1.00 / fraction) != 0) {
                 agentCounter++;
                 continue;
-
-
             }
-            Person person = f.createPerson(Id.createPersonId(commuterRelation.getFrom() + "_" + commuterRelation.getFrom() + "_" + agentCounter));
+            boolean metropolitanRegion = (metropolitanRegions.contains(commuterRelation.getFrom()) && metropolitanRegions.contains(commuterRelation.getTo()));
+
+            Person person = f.createPerson(Id.createPersonId(commuterRelation.getFrom() + "_" + commuterRelation.getTo() + "_" + agentCounter));
+            person.getAttributes().putAttribute("metropolitanRegion", metropolitanRegion);
+            person.getAttributes().putAttribute("homeZone", commuterRelation.getFrom());
+            person.getAttributes().putAttribute("workZone", commuterRelation.getTo());
             agentCounter++;
             population.addPerson(person);
             Plan plan = f.createPlan();

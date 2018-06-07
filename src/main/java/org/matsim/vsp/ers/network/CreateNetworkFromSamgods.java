@@ -48,6 +48,7 @@ public class CreateNetworkFromSamgods {
     private static final String networkFile = "D:\\ers\\network/Base2012_network.xml";
     Network network;
     private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3021", "EPSG:3006");
+    private double carlinkdetourfactor = 1.2;
 
     public static void main(String[] args) {
         CreateNetworkFromSamgods createNetworkFromSamgods = new CreateNetworkFromSamgods();
@@ -256,6 +257,10 @@ public class CreateNetworkFromSamgods {
         }
         link.setAllowedModes(modes);
         link.setCapacity(capacity);
+        if (modes.contains(TransportMode.car) && (!modes.contains(TransportMode.ship))) {
+            link.setLength(link.getLength() * carlinkdetourfactor);
+        }
+
 
     }
 
