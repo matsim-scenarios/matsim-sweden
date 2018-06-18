@@ -4,39 +4,39 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.*;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingModule;
 
-import java.util.Iterator;
-
 public class SwissRailRaptorModuleAsTeleportedMode extends AbstractModule {
-    public SwissRailRaptorModuleAsTeleportedMode() {
-    }
 
+    @Override
     public void install() {
-        this.bind(SwissRailRaptor.class).toProvider(SwissRailRaptorFactory.class);
-        Iterator var1 = this.getConfig().transit().getTransitModes().iterator();
 
-        while (var1.hasNext()) {
-            String mode = (String) var1.next();
-            this.addRoutingModuleBinding(mode).toProvider(SwissRailRaptorRoutingModuleProvider.class);
+        bind(SwissRailRaptor.class).toProvider(SwissRailRaptorFactory.class);
+
+        for (String mode : getConfig().transit().getTransitModes()) {
+            addRoutingModuleBinding(mode).toProvider(SwissRailRaptorRoutingModuleProvider.class);
         }
+        addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
+        bind(RaptorParametersForPerson.class).to(DefaultRaptorParametersForPerson.class);
 
-        this.addRoutingModuleBinding("transit_walk").to(Key.get(RoutingModule.class, Names.named("walk")));
-        this.bind(RaptorParametersForPerson.class).to(DefaultRaptorParametersForPerson.class);
-        SwissRailRaptorConfigGroup srrConfig = (SwissRailRaptorConfigGroup) ConfigUtils.addOrGetModule(this.getConfig(), SwissRailRaptorConfigGroup.class);
+        SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(getConfig(), SwissRailRaptorConfigGroup.class);
+
         if (srrConfig.isUseRangeQuery()) {
-            this.bind(RaptorRouteSelector.class).to(ConfigurableRaptorRouteSelector.class);
+            bind(RaptorRouteSelector.class).to(ConfigurableRaptorRouteSelector.class);
         } else {
-            this.bind(RaptorRouteSelector.class).to(LeastCostRaptorRouteSelector.class);
+            bind(RaptorRouteSelector.class).to(LeastCostRaptorRouteSelector.class); // just a simple default in case it ever gets used.
         }
 
         if (srrConfig.isUseIntermodalAccessEgress()) {
-            this.bind(MainModeIdentifier.class).to(IntermodalAwareRouterModeIdentifier.class);
+            bind(MainModeIdentifier.class).to(IntermodalAwareRouterModeIdentifier.class);
         }
+        bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);
     }
 
 
 }
+

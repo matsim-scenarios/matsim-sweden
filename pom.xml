@@ -38,7 +38,7 @@
         <dependency>
             <groupId>com.github.SchweizerischeBundesbahnen</groupId>
             <artifactId>matsim-sbb-extensions</artifactId>
-            <version>0.10.0</version>
+			<version>0.10.1</version>
         </dependency>
 	</dependencies>
 

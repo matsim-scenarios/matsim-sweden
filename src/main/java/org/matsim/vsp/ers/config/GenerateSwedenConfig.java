@@ -46,16 +46,16 @@ public class GenerateSwedenConfig {
         config.transit().setVehiclesFile("transit/transitVehicles.xml.gz");
 
         ControlerConfigGroup ccg = config.controler();
-        ccg.setRunId("se_01" + "." + flowCap);
+        ccg.setRunId("se_05" + "." + flowCap);
         ccg.setOutputDirectory("output/" + ccg.getRunId() + "/");
         ccg.setFirstIteration(0);
-        int lastIteration = 300;
+        int lastIteration = 200;
         ccg.setLastIteration(lastIteration);
         ccg.setMobsim("qsim");
         ccg.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         ccg.setWriteEventsInterval(100);
         ccg.setWritePlansInterval(100);
-        config.global().setNumberOfThreads(16);
+        config.global().setNumberOfThreads(8);
 
         QSimConfigGroup qsc = config.qsim();
         qsc.setUsingFastCapacityUpdate(true);
@@ -88,18 +88,18 @@ public class GenerateSwedenConfig {
 
         PlanCalcScoreConfigGroup.ModeParams car = config.planCalcScore().getModes().get(TransportMode.car);
         car.setMonetaryDistanceRate(-0.0001);
-        car.setMarginalUtilityOfTraveling(-5);
+        car.setMarginalUtilityOfTraveling(-3);
         car.setConstant(-3);
 
         PlanCalcScoreConfigGroup.ModeParams pt = config.planCalcScore().getModes().get(TransportMode.pt);
-        pt.setMarginalUtilityOfTraveling(-1.0);
-        pt.setConstant(-1.5);
+        pt.setMarginalUtilityOfTraveling(-1.75);
+        pt.setConstant(-2);
 
         PlanCalcScoreConfigGroup.ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
-        walk.setMarginalUtilityOfTraveling(-2);
+        walk.setMarginalUtilityOfTraveling(-1);
 
         PlanCalcScoreConfigGroup.ModeParams bike = config.planCalcScore().getModes().get(TransportMode.bike);
-        bike.setMarginalUtilityOfTraveling(-6);
+        bike.setMarginalUtilityOfTraveling(-3);
         bike.setConstant(-2);
 
         PlansCalcRouteConfigGroup.ModeRoutingParams bikeP = config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike);
@@ -145,7 +145,7 @@ public class GenerateSwedenConfig {
         config.subtourModeChoice().setConsiderCarAvailability(true);
         config.subtourModeChoice().setModes(new String[]{"car", "bike", "walk", "pt"});
 
-        new ConfigWriter(config).write("D:/ers/commuters/config_" + flowCap + ".xml");
+        new ConfigWriter(config).write("D:/ers/config_" + flowCap + ".xml");
 
 
     }

@@ -52,7 +52,7 @@ public class TravelDistanceEvaluator {
     public static void main(String[] args) throws IOException {
         TravelDistanceEvaluator tde = new TravelDistanceEvaluator();
 
-        tde.run("D:/runs-svn/ers_sweden/basecase/se.0.01/se.0.01.output_plans.xml.gz");
+        tde.run("D:/runs-svn/ers_sweden/basecase/se_05.0.01/se_05.0.01.output_plans.xml.gz");
 
     }
 

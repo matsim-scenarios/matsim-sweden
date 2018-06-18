@@ -22,9 +22,6 @@ package org.matsim.vsp.ers;/*
  */
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -43,13 +40,8 @@ public class RunSweden {
         }
         Config config = ConfigUtils.loadConfig(configFile);
         config.transit().setUseTransit(false);
-        config.controler().setWriteEventsUntilIteration(3);
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
-//        new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFileURL(config.getContext()).getFile());
-
-
-        adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -63,17 +55,4 @@ public class RunSweden {
         controler.run();
     }
 
-    /**
-     * this is useful for pt links when only a fraction of the population is simulated, but bus frequency remains the same.
-     * Otherwise, pt vehicles may get stuck.
-     */
-    private static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor) {
-        if (flowCapacityFactor < 1.0) {
-            for (Link l : network.getLinks().values()) {
-                if (l.getAllowedModes().contains(TransportMode.pt)) {
-                    l.setCapacity(l.getCapacity() / flowCapacityFactor);
-                }
-            }
-        }
-    }
 }
