@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -110,7 +109,7 @@ public class CreateNetworkFromSamgods {
                         throw new RuntimeException("Node " + fromnodeId.toString() + " not found.");
                     }
                     Link l = network.getFactory().createLink(linkId, fromNode, toNode);
-                    l.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) + 1);
+                    l.setLength(Double.parseDouble(row[13]));
                     double speed = Double.parseDouble(row[6]) / 3.6;
                     double lanes = Double.parseDouble(row[9]);
                     int category = Integer.parseInt(row[7]);
