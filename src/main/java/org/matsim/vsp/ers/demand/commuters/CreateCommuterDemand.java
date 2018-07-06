@@ -118,7 +118,7 @@ public class CreateCommuterDemand {
         }
     }
 
-    private Map<String, Geometry> readShapeFileAndExtractGeometry(String filename, String key) {
+    public static Map<String, Geometry> readShapeFileAndExtractGeometry(String filename, String key) {
 
         Map<String, Geometry> geometry = new TreeMap<>();
         for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {

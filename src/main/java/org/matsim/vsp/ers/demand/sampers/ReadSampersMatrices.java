@@ -32,8 +32,8 @@ import java.util.Map;
 
 public class ReadSampersMatrices {
 
-    Map<Id<PassengerFlow>, PassengerFlow> flowMap = new HashMap<>();
-    Map<String, String> zoneConverterMap = new HashMap<>();
+    private Map<Id<PassengerFlow>, PassengerFlow> flowMap = new HashMap<>();
+    private Map<String, String> zoneConverterMap = new HashMap<>();
 
     public static void main(String[] args) {
         final String zonesFile = "D:/ers/Sampers/Resultat/zoneconversion.txt";
@@ -42,7 +42,7 @@ public class ReadSampersMatrices {
     }
 
 
-    private void run(String zonesFile, String matricesFolder) {
+    public void run(String zonesFile, String matricesFolder) {
         readZoneTransformation(zonesFile);
         readSampersFlows(matricesFolder + "nat_bil_pri_amd_2014.txt", TransportMode.car, false);
         readSampersFlows(matricesFolder + "nat_bil_tjn_amd_2014.txt", TransportMode.car, true);
@@ -57,6 +57,9 @@ public class ReadSampersMatrices {
 
     }
 
+    public Map<Id<PassengerFlow>, PassengerFlow> getFlowMap() {
+        return flowMap;
+    }
 
     private void readSampersFlows(String file, String mode, boolean isBusiness) {
         TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
