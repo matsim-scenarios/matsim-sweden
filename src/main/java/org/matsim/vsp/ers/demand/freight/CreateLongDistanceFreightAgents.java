@@ -44,7 +44,7 @@ public class CreateLongDistanceFreightAgents {
     private Map<Id<ActivityFacility>, ParseNodeLocations.SamGodsNode> nodes;
     private Set<ParseODs.GoodsFlow> goodsFlows;
     private Random r = MatsimRandom.getRandom();
-
+    private static double samplesize = 0.1;
 
     public static void main(String[] args) {
         new CreateLongDistanceFreightAgents().run();
@@ -57,11 +57,11 @@ public class CreateLongDistanceFreightAgents {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
         ParseODs ods = new ParseODs();
-        String inputFolder = "C:/Users/Joschka/ownCloud/ers/Loaded/";
+        String inputFolder = "D:/ers/samgods/Loaded/";
         ods.run(inputFolder, true);
-        String inputFolderEmpty = "C:/Users/Joschka/ownCloud/ers/Empty/";
+        String inputFolderEmpty = "D:/ers/samgods/Empty/";
         ods.run(inputFolderEmpty, false);
-        String nodesFile = "C:/Users/Joschka/ownCloud/ers/nodes.csv";
+        String nodesFile = "D:/ers/samgods/nodes.csv";
 
         this.goodsFlows = ods.getGoodsFlows();
         ParseNodeLocations parseNodeLocations = new ParseNodeLocations();
@@ -69,19 +69,19 @@ public class CreateLongDistanceFreightAgents {
         this.nodes = parseNodeLocations.getNodes();
         calculateDailyTripNumbers(goodsFlows, r);
         goodsFlows.stream().filter(new TouchesSweden()).forEach(flow -> generateAgents(flow));
-        new PopulationWriter(scenario.getPopulation()).write("C:/Users/Joschka/ownCloud/ers/samgoodspopulation.xml");
+        new PopulationWriter(scenario.getPopulation()).write("D:/ers/samgods/samgoodspopulation" + samplesize + ".xml");
     }
 
     private void generateAgents(ParseODs.GoodsFlow flow) {
         Population population = scenario.getPopulation();
         PopulationFactory pf = population.getFactory();
         String mode = getMode(flow.vehicleTypeId);
-
+        if (!mode.equals(TransportMode.truck)) return;
         ParseNodeLocations.SamGodsNode fromNode = nodes.get(flow.fromId);
         ParseNodeLocations.SamGodsNode toNode = nodes.get(flow.toId);
 
         String loaded = (flow.loaded) ? "l" : "e";
-        for (int i = 0; i < flow.dailyTrips; i++) {
+        for (int i = 0; i < flow.dailyTrips * samplesize; i++) {
             Id<Person> personId = Id.createPersonId(flow.fromId.toString() + "_" + flow.toId.toString() + "_" + flow.vehicleTypeId.toString() + "_" + loaded + "_" + i);
             Person person = pf.createPerson(personId);
             population.addPerson(person);

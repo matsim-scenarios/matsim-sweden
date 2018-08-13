@@ -48,7 +48,7 @@ public class CreateCommuterDemand {
     public static final String COMMUTERS = "D:/ers/commuters/commuters2016.csv";
     public static final String COMMUNITYSHAPE = "D:/ers/commuters/Kommun_Sweref99TM_region.shp";
     private int agentCounter = 0;
-    private double fraction = 1.0;
+    private double fraction = 0.1;
     private List<CommuterRelationV2> commuterRelations;
     private Map<String, Geometry> communities;
     private Population population;
@@ -101,7 +101,7 @@ public class CreateCommuterDemand {
             Plan plan = f.createPlan();
             person.addPlan(plan);
             Coord homeCoord = corineLandCoverData.getRandomCoord(fromGeo, LandCoverUtils.LandCoverActivityType.home);
-            Coord workCoord = corineLandCoverData.getRandomCoord(fromGeo, LandCoverUtils.LandCoverActivityType.other);
+            Coord workCoord = corineLandCoverData.getRandomCoord(toGeo, LandCoverUtils.LandCoverActivityType.other);
             Activity h1 = f.createActivityFromCoord("home", homeCoord);
             h1.setEndTime(6.5 * 3600 + random.nextInt(9000));
             plan.addActivity(h1);

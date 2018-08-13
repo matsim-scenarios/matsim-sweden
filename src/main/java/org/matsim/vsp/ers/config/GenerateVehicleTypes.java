@@ -17,42 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.ers;/*
- * created by jbischoff, 06.06.2018
+package org.matsim.vsp.ers.config;/*
+ * created by jbischoff, 17.07.2018
  */
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vsp.ers.ptrouting.SwissRailRaptorModuleAsTeleportedMode;
-import org.matsim.vsp.ers.scoring.AgentSpecificASCScoring;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
 
-public class RunSweden {
+import static org.matsim.core.config.ConfigUtils.createConfig;
+import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
+public class GenerateVehicleTypes {
     public static void main(String[] args) {
-        String configFile = "D:\\ers\\configa_0.01.xml";
-        if (args.length > 0) {
-            configFile = args[0];
-        }
-        Config config = ConfigUtils.loadConfig(configFile);
-        config.transit().setUseTransit(false);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Config config = createConfig();
+        Scenario scenario = createScenario(config);
+        VehicleType car = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+        car.setDescription("passenger Car");
+        car.setMaximumVelocity(120 / 3.6);
+        scenario.getVehicles().addVehicleType(car);
 
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bindScoringFunctionFactory().to(AgentSpecificASCScoring.class);
-                bind(TransitSchedule.class).toInstance(scenario.getTransitSchedule());
-            }
-        });
-        controler.addOverridingModule(new SwissRailRaptorModuleAsTeleportedMode());
+        VehicleType truck = scenario.getVehicles().getFactory().createVehicleType(Id.create(TransportMode.truck, VehicleType.class));
+        truck.setMaximumVelocity(85 / 3.6);
+        truck.setLength(18);
+        truck.setPcuEquivalents(3);
+        scenario.getVehicles().addVehicleType(truck);
 
-        controler.run();
+        new VehicleWriterV1(scenario.getVehicles()).writeFile("D:/ers/scenario/vehicleTypes.xml");
     }
-
 }

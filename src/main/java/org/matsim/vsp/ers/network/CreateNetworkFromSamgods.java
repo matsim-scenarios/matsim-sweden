@@ -36,6 +36,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.run.NetworkCleaner;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +45,8 @@ public class CreateNetworkFromSamgods {
 
     private static final String nodesFile = "D:\\ers\\network/Base2012_Node.csv";
     private static final String linksFile = "D:\\ers\\network/Base2012_Link.csv";
-    private static final String networkFile = "D:\\ers\\network/Base2012_network.xml";
+    private static final String networkFile = "D:\\ers\\network/Base2012_network_car.xml";
+    private static final String networkFileC = "D:\\ers\\network/Base2012_network_car_cleaned.xml";
     Network network;
     private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3021", "EPSG:3006");
     private double carlinkdetourfactor = 1.2;
@@ -62,6 +64,7 @@ public class CreateNetworkFromSamgods {
         createNodes();
         createLinks();
         new NetworkWriter(scenario.getNetwork()).write(networkFile);
+        new NetworkCleaner().run(networkFile, networkFileC);
     }
 
 
@@ -116,8 +119,9 @@ public class CreateNetworkFromSamgods {
                     l.setFreespeed(speed);
                     l.setNumberOfLanes(lanes);
                     setCapacityAndMode(category, l);
+
                     l.getAttributes().putAttribute("category", category);
-                    network.addLink(l);
+                    if (l.getAllowedModes().contains(TransportMode.car)) network.addLink(l);
                 } else {
                     headerRead = true;
                 }
@@ -257,7 +261,7 @@ public class CreateNetworkFromSamgods {
         link.setAllowedModes(modes);
         link.setCapacity(capacity);
         if (modes.contains(TransportMode.car) && (!modes.contains(TransportMode.ship))) {
-            link.setLength(link.getLength() * carlinkdetourfactor);
+            link.setLength(link.getLength() * carlinkdetourfactor + 1.0);
         }
 
 

@@ -29,21 +29,24 @@ import org.matsim.core.config.groups.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class GenerateSwedenConfig {
 
-    private static double storageCap = 0.05;
-    private static double flowCap = 0.01;
+    private static double storageCap = 0.2;
+    private static double flowCap = 0.1;
 
     public static void main(String[] args) {
 
         Config config = ConfigUtils.createConfig();
 
         //network
-        config.network().setInputFile("network/network-pt.xml.gz");
+        config.network().setInputFile("network.xml.gz");
 
-        config.transit().setTransitScheduleFile("transit/transitSchedule.xml.gz");
+        config.transit().setTransitScheduleFile("transitSchedule.xml.gz");
         config.transit().setUseTransit(true);
-        config.transit().setVehiclesFile("transit/transitVehicles.xml.gz");
+        config.transit().setVehiclesFile("transitVehicles.xml.gz");
 
         ControlerConfigGroup ccg = config.controler();
         ccg.setRunId("se_05" + "." + flowCap);
@@ -56,6 +59,7 @@ public class GenerateSwedenConfig {
         ccg.setWriteEventsInterval(100);
         ccg.setWritePlansInterval(100);
         config.global().setNumberOfThreads(8);
+
 
         QSimConfigGroup qsc = config.qsim();
         qsc.setUsingFastCapacityUpdate(true);
@@ -70,10 +74,13 @@ public class GenerateSwedenConfig {
         config.parallelEventHandling().setNumberOfThreads(6);
 
 
-        config.plans().setInputFile("commuters/commuter_population_0.01.xml.gz");
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+        config.vehicles().setVehiclesFile("vehicleTypes.xml");
+
+        config.plans().setInputFile("merged_population.xml.gz");
+        config.plans().setInputPersonAttributeFile("merged_population_attributes.xml.gz");
 
         config.planCalcScore().setMarginalUtilityOfMoney(0.1); //10 SEK  --- 1 EUR
-
         PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams();
         work.setActivityType("work");
         work.setOpeningTime(7.5 * 3600);
@@ -86,13 +93,58 @@ public class GenerateSwedenConfig {
         home.setTypicalDuration(14 * 3600);
         config.planCalcScore().addActivityParams(home);
 
+        PlanCalcScoreConfigGroup.ActivityParams freight = new PlanCalcScoreConfigGroup.ActivityParams();
+        freight.setActivityType("freight");
+        freight.setTypicalDuration(24 * 3600);
+        config.planCalcScore().addActivityParams(freight);
+
+        PlanCalcScoreConfigGroup.ActivityParams priv = new PlanCalcScoreConfigGroup.ActivityParams();
+        priv.setActivityType("private");
+        priv.setTypicalDuration(4 * 3600);
+        priv.setOpeningTime(9.0 * 3600);
+        priv.setClosingTime(23.9 * 3600);
+        config.planCalcScore().addActivityParams(priv);
+
+        PlanCalcScoreConfigGroup.ActivityParams priv_sameday = new PlanCalcScoreConfigGroup.ActivityParams();
+        priv_sameday.setActivityType("private_sameday");
+        priv_sameday.setTypicalDuration(4 * 3600);
+        priv_sameday.setOpeningTime(7.5 * 3600);
+        priv_sameday.setClosingTime(17.5 * 3600);
+        config.planCalcScore().addActivityParams(priv_sameday);
+
+        PlanCalcScoreConfigGroup.ActivityParams business = new PlanCalcScoreConfigGroup.ActivityParams();
+        business.setActivityType("business");
+        business.setOpeningTime(9 * 3600);
+        business.setClosingTime(23.5 * 3600);
+        business.setTypicalDuration(4 * 3600);
+        config.planCalcScore().addActivityParams(business);
+
+        PlanCalcScoreConfigGroup.ActivityParams business_sameday = new PlanCalcScoreConfigGroup.ActivityParams();
+        business_sameday.setActivityType("business_sameday");
+        business_sameday.setOpeningTime(7.5 * 3600);
+        business_sameday.setClosingTime(17.5 * 3600);
+        business_sameday.setTypicalDuration(5 * 3600);
+        config.planCalcScore().addActivityParams(business_sameday);
+
+        List<String> mainModes = Arrays.asList(new String[]{TransportMode.car, TransportMode.truck});
+        config.qsim().setMainModes(mainModes);
+        config.plansCalcRoute().setNetworkModes(mainModes);
+        config.travelTimeCalculator().setAnalyzedModes("car,truck");
+        config.travelTimeCalculator().setSeparateModes(false);
+
         PlanCalcScoreConfigGroup.ModeParams car = config.planCalcScore().getModes().get(TransportMode.car);
         car.setMonetaryDistanceRate(-0.0001);
         car.setMarginalUtilityOfTraveling(-3);
         car.setConstant(-3);
 
+        PlanCalcScoreConfigGroup.ModeParams truck = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.truck);
+        truck.setMonetaryDistanceRate(-0.0001);
+        truck.setMarginalUtilityOfTraveling(-3);
+        truck.setConstant(-3);
+        config.planCalcScore().addModeParams(truck);
+
         PlanCalcScoreConfigGroup.ModeParams pt = config.planCalcScore().getModes().get(TransportMode.pt);
-        pt.setMarginalUtilityOfTraveling(-1.75);
+        pt.setMarginalUtilityOfTraveling(-2);
         pt.setConstant(-2);
 
         PlanCalcScoreConfigGroup.ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
@@ -113,28 +165,35 @@ public class GenerateSwedenConfig {
         StrategyConfigGroup.StrategySettings subtour = new StrategyConfigGroup.StrategySettings();
         subtour.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString());
         subtour.setWeight(0.1);
+        subtour.setSubpopulation("commuters");
         config.strategy().addStrategySettings(subtour);
 
-        StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings();
-        reroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
-        reroute.setWeight(0.1);
-        config.strategy().addStrategySettings(reroute);
+        List<String> subpop = Arrays.asList(new String[]{"commuters", "freight", "longdistance"});
+        for (String p : subpop) {
+            StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings();
+            reroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
+            reroute.setWeight(0.1);
+            reroute.setSubpopulation(p);
+            config.strategy().addStrategySettings(reroute);
 
-        StrategyConfigGroup.StrategySettings timeAllocation = new StrategyConfigGroup.StrategySettings();
-        timeAllocation.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.toString());
-        timeAllocation.setWeight(0.1);
-        config.strategy().addStrategySettings(timeAllocation);
+            StrategyConfigGroup.StrategySettings timeAllocation = new StrategyConfigGroup.StrategySettings();
+            timeAllocation.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.toString());
+            timeAllocation.setWeight(0.1);
+            timeAllocation.setSubpopulation(p);
+            config.strategy().addStrategySettings(timeAllocation);
 
-        StrategyConfigGroup.StrategySettings timeAllocationReroute = new StrategyConfigGroup.StrategySettings();
-        timeAllocationReroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator_ReRoute.toString());
-        timeAllocationReroute.setWeight(0.1);
-        config.strategy().addStrategySettings(timeAllocationReroute);
+            StrategyConfigGroup.StrategySettings timeAllocationReroute = new StrategyConfigGroup.StrategySettings();
+            timeAllocationReroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator_ReRoute.toString());
+            timeAllocationReroute.setWeight(0.1);
+            timeAllocation.setSubpopulation(p);
+            config.strategy().addStrategySettings(timeAllocationReroute);
 
-        StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
-        changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
-        changeExpBeta.setWeight(0.6);
-        config.strategy().addStrategySettings(changeExpBeta);
-
+            StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+            changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+            changeExpBeta.setWeight(0.6);
+            changeExpBeta.setSubpopulation(p);
+            config.strategy().addStrategySettings(changeExpBeta);
+        }
 
         config.strategy().setFractionOfIterationsToDisableInnovation(.8);
 
@@ -145,7 +204,7 @@ public class GenerateSwedenConfig {
         config.subtourModeChoice().setConsiderCarAvailability(true);
         config.subtourModeChoice().setModes(new String[]{"car", "bike", "walk", "pt"});
 
-        new ConfigWriter(config).write("D:/ers/config_" + flowCap + ".xml");
+        new ConfigWriter(config).write("D:/ers/scenario/config_" + flowCap + ".xml");
 
 
     }
