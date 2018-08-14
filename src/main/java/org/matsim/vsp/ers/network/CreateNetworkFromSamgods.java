@@ -133,6 +133,7 @@ public class CreateNetworkFromSamgods {
         Set<String> modes = new HashSet<>();
         double capacity = 0;
         double freeSpeed = link.getFreespeed();
+        double lanes = link.getNumberOfLanes();
         switch (category) {
             //major motorway, e.g. E4
 
@@ -140,21 +141,24 @@ public class CreateNetworkFromSamgods {
             case 501: {
                 modes.add(TransportMode.truck);
                 modes.add(TransportMode.car);
-                capacity = 1800;
+                capacity = 1800 * lanes;
+                freeSpeed = 110 / 3.6;
                 break;
             }
             case 12:
             case 502: { //freeway
                 modes.add(TransportMode.truck);
                 modes.add(TransportMode.car);
-                capacity = 1500;
+                freeSpeed = 90 / 3.6;
+                capacity = 1500 * lanes;
                 break;
             }
             case 13:
             case 503: { //highway
                 modes.add(TransportMode.truck);
                 modes.add(TransportMode.car);
-                capacity = 1200;
+                freeSpeed = 90 / 3.6;
+                capacity = 1200 * lanes;
                 break;
             }
 
@@ -166,7 +170,7 @@ public class CreateNetworkFromSamgods {
             case 504: { //highway
                 modes.add(TransportMode.truck);
                 modes.add(TransportMode.car);
-                capacity = 900;
+                capacity = 900 * lanes;
                 break;
             }
             case 110:
