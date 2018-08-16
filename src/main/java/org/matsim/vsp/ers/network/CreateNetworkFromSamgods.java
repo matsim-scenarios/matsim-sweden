@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.filter.NetworkFilterManager;
+import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -63,7 +65,18 @@ public class CreateNetworkFromSamgods {
         network = scenario.getNetwork();
         createNodes();
         createLinks();
-        new NetworkWriter(scenario.getNetwork()).write(networkFile);
+        NetworkFilterManager networkFilterManager = new NetworkFilterManager(network);
+        networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
+            @Override
+            public boolean judgeLink(Link l) {
+                if (l.getCoord().getX() > -533409 && l.getCoord().getX() < 1874924 && l.getCoord().getY() > 5666078 && l.getCoord().getY() < 7913083)
+                    return true;
+                else return false;
+            }
+        });
+        Network network2 = networkFilterManager.applyFilters();
+        new NetworkWriter(network2).write(networkFile);
+
         new NetworkCleaner().run(networkFile, networkFileC);
     }
 
