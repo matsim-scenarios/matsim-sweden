@@ -193,7 +193,7 @@ public class CreateNetworkFromSamgods {
                 //connectors
                 modes.add(TransportMode.truck);
                 modes.add(TransportMode.car);
-                capacity = 500;
+                capacity = 1500;
                 break;
 
             }
