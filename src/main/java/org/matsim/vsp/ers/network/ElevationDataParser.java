@@ -35,7 +35,6 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.objectattributes.DoubleArrayConverter;
 import org.opengis.referencing.operation.TransformException;
 
 import java.awt.image.Raster;
@@ -88,7 +87,6 @@ public class ElevationDataParser {
         }
         System.out.println(zs + " z coordinates set");
         NetworkWriter networkWriter = new NetworkWriter(network);
-        networkWriter.putAttributeConverter(double[].class, new DoubleArrayConverter());
         networkWriter.write("D:/ers/network/Base2012_network_car_cleaned_zs.xml");
     }
 
@@ -113,7 +111,7 @@ public class ElevationDataParser {
                 break;
             }
             double slope = (nextElevation - lastElevation) / CoordUtils.calcEuclideanDistance(nextCoord, lastCoord);
-            slopes[i] = slope;
+            slopes[i] = (double) Math.round(slope * 10000.) / 10000.;
             if (Math.abs(slope) >= minimumSlope) {
                 hasRelevantSlope = true;
             }
