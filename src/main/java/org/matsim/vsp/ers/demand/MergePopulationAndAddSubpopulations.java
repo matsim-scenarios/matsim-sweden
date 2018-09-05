@@ -34,7 +34,7 @@ public class MergePopulationAndAddSubpopulations {
 
     private static String commuterDemand = "D:/ers/commuters/commuter_population_0.1.xml.gz";
     private static String freightDemand = "D:/ers/samgods/samgoodspopulation0.1.xml";
-    private static String sampersDemand = "D:/ers/Sampers/Resultat/sampers_trips.xml.gz";
+    private static String sampersDemand = "D:/ers/Sampers/Resultat/sampers_trips_0.07.xml.gz";
     private static String outputPopulation = "D:/ers/scenario/merged_population.xml.gz";
     private static String outputPopulationAttributes = "D:/ers/scenario/merged_population_attributes.xml.gz";
 

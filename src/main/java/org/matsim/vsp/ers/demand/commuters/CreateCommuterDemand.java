@@ -26,19 +26,21 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.vsp.corineLandcover.CorineLandCoverData;
-import playground.vsp.corineLandcover.LandCoverUtils;
 import playground.vsp.openberlinscenario.cemdap.input.CommuterRelationV2;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
@@ -47,6 +49,7 @@ public class CreateCommuterDemand {
 
     public static final String COMMUTERS = "D:/ers/commuters/commuters2016.csv";
     public static final String COMMUNITYSHAPE = "D:/ers/commuters/Kommun_Sweref99TM_region.shp";
+    private double maxCommutingBeelineDistance = 80000;
     private int agentCounter = 0;
     private double fraction = 0.1;
     private List<CommuterRelationV2> commuterRelations;
@@ -54,6 +57,7 @@ public class CreateCommuterDemand {
     private Population population;
     private CorineLandCoverData corineLandCoverData;
     private Random random = MatsimRandom.getRandom();
+    private int noOfThreads = 4;
 
     private List<String> metropolitanRegions = Arrays.asList(new String[]{"0114", "0115", "1402", "0117", "1407", "0120", "0123", "0125", "0126", "0127", "0128", "0136", "0138", "0139", "1440", "0140", "1441", "0160", "0162", "0163", "0180", "0181", "0182", "0183", "0184", "0186", "0187", "0191", "0192", "1230", "1480", "1231", "1481", "1233", "1482", "1261", "1262", "1263", "1280", "1281", "1285", "1287", "1384"});
 
@@ -67,56 +71,30 @@ public class CreateCommuterDemand {
         this.population = scenario.getPopulation();
         ReadCommuterFile readCommuterFile = new ReadCommuterFile();
         readCommuterFile.readCommuterFile(COMMUTERS);
-        commuterRelations = readCommuterFile.getCommuterRelations();
         communities = readShapeFileAndExtractGeometry(COMMUNITYSHAPE, "KnKod");
+        commuterRelations = readCommuterFile.getCommuterRelations();
+        commuterRelations = filterCommuterRelations(commuterRelations);
+
         corineLandCoverData = new CorineLandCoverData("D:/ers/clc/landcover_rel_se.shp");
-        commuterRelations.forEach(commuterRelationV2 -> createAgents(commuterRelationV2));
-        new PopulationWriter(population).write("D:/ers/commuters/commuter_population_" + fraction + ".xml.gz");
+        ParallelDemandGenerator generator = new ParallelDemandGenerator(communities, corineLandCoverData, metropolitanRegions, MatsimRandom.getLocalInstance(), fraction, population.getFactory());
+        List<Person> personList = commuterRelations.parallelStream().flatMap(r -> generator.generatePersons(r).stream()).collect(Collectors.toList());
+        personList.forEach(population::addPerson);
+
+        new PopulationWriter(population).write("D:/ers/commuters/commuter_population_shrinked_" + fraction + ".xml.gz");
     }
 
-    private void createAgents(CommuterRelationV2 commuterRelation) {
-        PopulationFactory f = population.getFactory();
-        Geometry fromGeo = communities.get(commuterRelation.getFrom());
-        if (fromGeo == null) {
-            throw new RuntimeException(commuterRelation.getFrom() + " - community not found in Shape.");
-        }
-        Geometry toGeo = communities.get(commuterRelation.getTo());
-        if (toGeo == null) {
-            throw new RuntimeException(commuterRelation.getTo() + " - community not found in Shape.");
-        }
-
-        for (int i = 0; i < commuterRelation.getTrips(); i++) {
-            if (agentCounter % (1.00 / fraction) != 0) {
-                agentCounter++;
-                continue;
+    private List<CommuterRelationV2> filterCommuterRelations(List<CommuterRelationV2> commuterRelations) {
+        List<CommuterRelationV2> relations = new ArrayList<>();
+        for (CommuterRelationV2 relation : commuterRelations) {
+            Coord c1 = MGC.point2Coord(communities.get(relation.getFrom()).getCentroid());
+            Coord c2 = MGC.point2Coord(communities.get(relation.getTo()).getCentroid());
+            if (CoordUtils.calcEuclideanDistance(c1, c2) <= maxCommutingBeelineDistance) {
+                relations.add(relation);
             }
-            boolean metropolitanRegion = (metropolitanRegions.contains(commuterRelation.getFrom()) && metropolitanRegions.contains(commuterRelation.getTo()));
-
-            Person person = f.createPerson(Id.createPersonId(commuterRelation.getFrom() + "_" + commuterRelation.getTo() + "_" + agentCounter));
-            person.getAttributes().putAttribute("metropolitanRegion", metropolitanRegion);
-            person.getAttributes().putAttribute("homeZone", commuterRelation.getFrom());
-            person.getAttributes().putAttribute("workZone", commuterRelation.getTo());
-            agentCounter++;
-            population.addPerson(person);
-            Plan plan = f.createPlan();
-            person.addPlan(plan);
-            Coord homeCoord = corineLandCoverData.getRandomCoord(fromGeo, LandCoverUtils.LandCoverActivityType.home);
-            Coord workCoord = corineLandCoverData.getRandomCoord(toGeo, LandCoverUtils.LandCoverActivityType.other);
-            Activity h1 = f.createActivityFromCoord("home", homeCoord);
-            h1.setEndTime(6.5 * 3600 + random.nextInt(9000));
-            plan.addActivity(h1);
-            Leg l1 = f.createLeg(TransportMode.car);
-            plan.addLeg(l1);
-            Activity w = f.createActivityFromCoord("work", workCoord);
-            w.setEndTime(h1.getEndTime() + 5 * 3600 + random.nextInt(10800));
-            plan.addActivity(w);
-            Leg l2 = f.createLeg(TransportMode.car);
-            plan.addLeg(l2);
-
-            Activity h2 = f.createActivityFromCoord("home", homeCoord);
-            plan.addActivity(h2);
         }
+        return relations;
     }
+
 
     public static Map<String, Geometry> readShapeFileAndExtractGeometry(String filename, String key) {
 

@@ -50,8 +50,8 @@ public class AgentSpecificASCScoring implements ScoringFunctionFactory {
         Boolean metropolitanAgent = (Boolean) person.getAttributes().getAttribute("metropolitanRegion");
         if (metropolitanAgent != null) {
             if (metropolitanAgent) {
-                double constant = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getConstant() * 1.1;
-                builder.getModeParameters(TransportMode.car).setConstant(constant);
+                double constant = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getConstant() * 1.5;
+                builder.getModeParameters(TransportMode.car).setDailyMoneyConstant(constant);
             }
         }
 

@@ -46,7 +46,7 @@ public class CreateLongDistanceDemand {
     final String clcFile = "D:/ers/clc/landcover_rel_se.shp";
     private Map<String, Geometry> communities;
     private Population population;
-    double sampleSize = 0.1;
+    double sampleSize = 0.07;
     double distanceCar = 0;
     private int agentCount = 0;
 
@@ -70,7 +70,7 @@ public class CreateLongDistanceDemand {
         corineLandCoverData = new CorineLandCoverData(clcFile);
         this.population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         createDemand();
-        new PopulationWriter(population).write("D:/ers/Sampers/Resultat/sampers_trips.xml.gz");
+        new PopulationWriter(population).write("D:/ers/Sampers/Resultat/sampers_trips_" + sampleSize + ".xml.gz");
         System.out.print(distanceCar / 1000);
     }
 
@@ -99,7 +99,6 @@ public class CreateLongDistanceDemand {
             double ptTripsBusiness = flow.busTripsBusiness + flow.trainTripsBusiness;
             if (random.nextDouble() < (ptTripsBusiness - Math.floor(ptTripsBusiness))) ptTripsBusiness++;
             ptTripsBusiness = Math.floor(ptTripsBusiness);
-            Integer agentCount = 0;
             generateAgents(flow.fromZone, fromGeo, flow.toZone, toGeo, carTripsPrivate, "private", TransportMode.car);
             generateAgents(flow.fromZone, fromGeo, flow.toZone, toGeo, carTripsBusiness, "business", TransportMode.car);
             generateAgents(flow.fromZone, fromGeo, flow.toZone, toGeo, ptTripsBusiness, "business", TransportMode.pt);
@@ -114,7 +113,7 @@ public class CreateLongDistanceDemand {
         PopulationFactory f = population.getFactory();
 
         for (int i = 0; i < numberofTrips * sampleSize; i++) {
-            Person person = f.createPerson(Id.createPersonId(fromZone + "_" + toZone + "_" + agentCount));
+            Person person = f.createPerson(Id.createPersonId("ldt_" + fromZone + "_" + toZone + "_" + agentCount));
             person.getAttributes().putAttribute("homeZone", fromZone);
             person.getAttributes().putAttribute("destinationZone", toZone);
             agentCount++;
@@ -146,22 +145,23 @@ public class CreateLongDistanceDemand {
                 Activity h2 = f.createActivityFromCoord("home", homeCoord);
                 plan.addActivity(h2);
 
-            } else {
-                Person bperson = f.createPerson(Id.createPersonId(fromZone + "_" + toZone + "b_" + agentCount));
-                bperson.getAttributes().putAttribute("homeZone", toZone);
-                bperson.getAttributes().putAttribute("destinationZone", fromZone);
-                agentCount++;
-                population.addPerson(bperson);
-                Plan bplan = f.createPlan();
-                bperson.addPlan(bplan);
-                Activity bh1 = f.createActivityFromCoord("home", toCoord);
-                bh1.setEndTime(5.5 * 3600 + random.nextInt(10800));
-                bplan.addActivity(bh1);
-                Leg bl1 = f.createLeg(mode);
-                bplan.addLeg(bl1);
-                Activity bw = f.createActivityFromCoord(activityType, homeCoord);
-                bplan.addActivity(bw);
             }
+//            else {
+//                Person bperson = f.createPerson(Id.createPersonId(fromZone + "_" + toZone + "b_" + agentCount));
+//                bperson.getAttributes().putAttribute("homeZone", toZone);
+//                bperson.getAttributes().putAttribute("destinationZone", fromZone);
+//                agentCount++;
+//                population.addPerson(bperson);
+//                Plan bplan = f.createPlan();
+//                bperson.addPlan(bplan);
+//                Activity bh1 = f.createActivityFromCoord("home", toCoord);
+//                bh1.setEndTime(5.5 * 3600 + random.nextInt(10800));
+//                bplan.addActivity(bh1);
+//                Leg bl1 = f.createLeg(mode);
+//                bplan.addLeg(bl1);
+//                Activity bw = f.createActivityFromCoord(activityType, homeCoord);
+//                bplan.addActivity(bw);
+//            }
 
         }
 
