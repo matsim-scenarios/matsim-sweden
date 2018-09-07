@@ -57,7 +57,7 @@ public class SamplePopulation {
                 p.getSelectedPlan().getPlanElements().stream().filter(Activity.class::isInstance).forEach(a -> ((Activity) a).setLinkId(null));
                 population2.addPerson(p);
 
-                population2.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuter");
+                population2.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
             }
         }
         new PopulationWriter(population2).write(outputPopulation);
