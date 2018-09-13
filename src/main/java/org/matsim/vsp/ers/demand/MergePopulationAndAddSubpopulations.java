@@ -35,8 +35,11 @@ public class MergePopulationAndAddSubpopulations {
     private static String commuterDemand = "D:/ers/commuters/commuter_population_0.1.xml.gz";
     private static String freightDemand = "D:/ers/samgods/samgoodspopulation0.1.xml";
     private static String sampersDemand = "D:/ers/Sampers/Resultat/sampers_trips_0.07.xml.gz";
+    private static String stockholmPop = "D:/ers/stockholm/stockholm_0.1.xml.gz";
+
     private static String outputPopulation = "D:/ers/scenario/merged_population.xml.gz";
     private static String outputPopulationAttributes = "D:/ers/scenario/merged_population_attributes.xml.gz";
+
 
 
     public static void main(String[] args) {
@@ -46,12 +49,19 @@ public class MergePopulationAndAddSubpopulations {
         Scenario cscenario = createScenario(config);
         Scenario fscenario = createScenario(config);
         Scenario sscenario = createScenario(config);
+        Scenario stscenario = createScenario(config);
 
         new PopulationReader(cscenario).readFile(commuterDemand);
         new PopulationReader(fscenario).readFile(freightDemand);
         new PopulationReader(sscenario).readFile(sampersDemand);
+        new PopulationReader(stscenario).readFile(stockholmPop);
 
         cscenario.getPopulation().getPersons().values().forEach(p ->
+        {
+            scenario.getPopulation().addPerson(p);
+            scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+        });
+        stscenario.getPopulation().getPersons().values().forEach(p ->
         {
             scenario.getPopulation().addPerson(p);
             scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");

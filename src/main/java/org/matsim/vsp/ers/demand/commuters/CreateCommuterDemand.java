@@ -60,6 +60,7 @@ public class CreateCommuterDemand {
     private int noOfThreads = 4;
 
     private List<String> metropolitanRegions = Arrays.asList(new String[]{"0114", "0115", "1402", "0117", "1407", "0120", "0123", "0125", "0126", "0127", "0128", "0136", "0138", "0139", "1440", "0140", "1441", "0160", "0162", "0163", "0180", "0181", "0182", "0183", "0184", "0186", "0187", "0191", "0192", "1230", "1480", "1231", "1481", "1233", "1482", "1261", "1262", "1263", "1280", "1281", "1285", "1287", "1384"});
+    private List<String> stockholm = Arrays.asList(new String[]{"0188", "0114", "0115", "1402", "0117", "1407", "0120", "0123", "0125", "0126", "0127", "0128", "0136", "0138", "0139", "1440", "0140", "1441", "0160", "0162", "0163", "0180", "0181", "0182", "0183", "0184", "0186", "0187", "0191", "0192",});
 
     public static void main(String[] args) {
         new CreateCommuterDemand().run();
@@ -80,12 +81,14 @@ public class CreateCommuterDemand {
         List<Person> personList = commuterRelations.parallelStream().flatMap(r -> generator.generatePersons(r).stream()).collect(Collectors.toList());
         personList.forEach(population::addPerson);
 
-        new PopulationWriter(population).write("D:/ers/commuters/commuter_population_shrinked_" + fraction + ".xml.gz");
+        new PopulationWriter(population).write("D:/ers/commuters/commuter_population_shrinked_noStockholm_" + fraction + ".xml.gz");
     }
 
     private List<CommuterRelationV2> filterCommuterRelations(List<CommuterRelationV2> commuterRelations) {
         List<CommuterRelationV2> relations = new ArrayList<>();
         for (CommuterRelationV2 relation : commuterRelations) {
+            if (stockholm.contains(relation.getFrom())) continue;
+
             Coord c1 = MGC.point2Coord(communities.get(relation.getFrom()).getCentroid());
             Coord c2 = MGC.point2Coord(communities.get(relation.getTo()).getCentroid());
             if (CoordUtils.calcEuclideanDistance(c1, c2) <= maxCommutingBeelineDistance) {

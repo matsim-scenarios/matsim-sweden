@@ -32,9 +32,9 @@ import org.matsim.contrib.analysis.vsp.traveltimedistance.RunTraveltimeValidatio
  */
 public class RunHereValidation {
     public static void main(String[] args) {
-        String folder = "D:\\runs-svn\\ers_sweden\\basecase/se_05.0.1/";
-        String run = "se_05.0.1";
+        String folder = "D:\\runs-svn\\ers_sweden/sh02/";
+        String run = "sh02";
 
-        RunTraveltimeValidationExample.main(new String[]{folder + run + ".output_plans.xml.gz", folder + run + ".output_events.xml.gz", folder + run + ".output_network.xml.gz", "EPSG:3006", "", "", folder, "2018-09-16", "1000"});
+        RunTraveltimeValidationExample.main(new String[]{folder + run + ".output_plans.xml.gz", folder + run + ".output_events.xml.gz", folder + run + ".output_network.xml.gz", "EPSG:3006", "", "", folder, "2018-09-16", "2000"});
     }
 }

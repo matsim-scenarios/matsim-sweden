@@ -54,6 +54,7 @@ public class SamplePopulation {
         Population population2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
         for (Person p : scenario.getPopulation().getPersons().values()) {
             if (random.nextDouble() < sampleSize) {
+                p.getAttributes().putAttribute("metropolitanRegion", true);
                 p.getSelectedPlan().getPlanElements().stream().filter(Activity.class::isInstance).forEach(a -> ((Activity) a).setLinkId(null));
                 population2.addPerson(p);
 
