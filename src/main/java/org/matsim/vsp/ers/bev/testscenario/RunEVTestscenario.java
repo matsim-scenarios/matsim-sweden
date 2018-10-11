@@ -21,6 +21,7 @@ package org.matsim.vsp.ers.bev.testscenario;/*
  * created by jbischoff, 09.10.2018
  */
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -29,11 +30,15 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vsp.ers.scoring.AgentSpecificASCScoring;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.EvModule;
 import org.matsim.vsp.ev.charging.*;
 import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.file.LTHConsumptionModelReader;
+import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
+import org.matsim.vsp.ev.discharging.VehicleTypeSpecificDriveEnergyConsumptionFactory;
 import org.matsim.vsp.ev.routing.EVNetworkRoutingProvider;
 
 import java.util.function.Function;
@@ -49,12 +54,16 @@ public class RunEVTestscenario {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Function<Charger, ChargingStrategy> chargingStrategyFactory = charger -> new FixedSpeedChargingStrategy(charger.getPower() * 0.8);
 
+        VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
+        driveEnergyConsumptionFactory.addEnergyConsumptionModel("smallCar", new LTHConsumptionModelReader(Id.create("smallCar", VehicleType.class)).readFile("D:/ers/energyconsumption/CityCarMap.csv"));
+        driveEnergyConsumptionFactory.addEnergyConsumptionModel("truck", new LTHConsumptionModelReader(Id.create("truck", VehicleType.class)).readFile("D:/ers/energyconsumption/HGV40Map.csv"));
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new EvModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
+                bind(DriveEnergyConsumption.Factory.class).toInstance(driveEnergyConsumptionFactory);
                 bind(VehicleChargingHandler.class).asEagerSingleton();
                 addRoutingModuleBinding(TransportMode.car).toProvider(new EVNetworkRoutingProvider(TransportMode.car));
                 bind(ChargingLogic.Factory.class).toInstance(

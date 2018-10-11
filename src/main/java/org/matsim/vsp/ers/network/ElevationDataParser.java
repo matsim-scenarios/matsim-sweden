@@ -26,6 +26,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.DirectPosition2D;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -60,11 +61,12 @@ public class ElevationDataParser {
         // SRTM3:  http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
         // EU-DEM: http://data.eox.at/eudem
 
-        List<String> tiffFiles = Arrays.asList(new String[]{"D:/ers/network/dem/eu_dem_v11_E40N50/eu_dem_v11_E40N50.TIF", "D:/ers/network/dem/eu_dem_v11_E40N40/eu_dem_v11_E40N40.TIF", "D:/ers/network/dem/eu_dem_v11_E40N30/eu_dem_v11_E40N30.TIF"});
+        List<String> tiffFiles = Arrays.asList(new String[]{});
+//        List<String> tiffFiles = Arrays.asList(new String[]{"D:/ers/network/dem/eu_dem_v11_E40N50/eu_dem_v11_E40N50.TIF", "D:/ers/network/dem/eu_dem_v11_E40N40/eu_dem_v11_E40N40.TIF", "D:/ers/network/dem/eu_dem_v11_E40N30/eu_dem_v11_E40N30.TIF"});
 
         String scenarioCRS = "EPSG:3006"; // WGS84 as the coorinates to test below are stated like this
         Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile("D:/ers/network/Base2012_network_car_cleaned.xml");
+        new MatsimNetworkReader(network).readFile("D:/ers/scenario/network-osm.xml.gz");
         int zs = 0;
         for (String tiffFile : tiffFiles) {
             ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, scenarioCRS);
@@ -78,16 +80,25 @@ public class ElevationDataParser {
                         n.setCoord(new Coord(n.getCoord().getX(), n.getCoord().getY(), z));
                         zs++;
                         for (Link l : n.getOutLinks().values()) {
-                            elevationDataParser.addSlopes(l);
+                            if (l.getAllowedModes().contains(TransportMode.car))
+                                elevationDataParser.addSlopes(l);
                         }
 
                     }
                 }
             }
+
+
+        }
+        for (Node n : network.getNodes().values()) {
+            //setting a default value
+            if (!n.getCoord().hasZ()) {
+                n.setCoord(new Coord(n.getCoord().getX(), n.getCoord().getY(), 0));
+            }
         }
         System.out.println(zs + " z coordinates set");
         NetworkWriter networkWriter = new NetworkWriter(network);
-        networkWriter.write("D:/ers/network/Base2012_network_car_cleaned_zs.xml");
+        networkWriter.write("D:/ers/scenario/network-osm.xml.gz");
     }
 
     private void addSlopes(Link l) {

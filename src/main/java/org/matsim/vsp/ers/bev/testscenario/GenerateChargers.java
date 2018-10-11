@@ -46,12 +46,16 @@ public class GenerateChargers {
 
         Charger charger = new ChargerImpl(Id.create(113273 + "charger", Charger.class), EvUnitConversions.W_PER_kW * 50, 2, network.getLinks().get(Id.createLinkId(113273)), network.getLinks().get(Id.createLinkId(113273)).getCoord(), "fast");
         Charger charger2 = new ChargerImpl(Id.create(74836 + "charger", Charger.class), EvUnitConversions.W_PER_kW * 50, 2, network.getLinks().get(Id.createLinkId(74836)), network.getLinks().get(Id.createLinkId(74836)).getCoord(), "fast");
+        Charger chargert = new ChargerImpl(Id.create(113273 + "truckcharger", Charger.class), EvUnitConversions.W_PER_kW * 200, 2, network.getLinks().get(Id.createLinkId(113273)), network.getLinks().get(Id.createLinkId(113273)).getCoord(), "truck");
+        Charger chargert2 = new ChargerImpl(Id.create(74836 + "truckcharger", Charger.class), EvUnitConversions.W_PER_kW * 200, 2, network.getLinks().get(Id.createLinkId(74836)), network.getLinks().get(Id.createLinkId(74836)).getCoord(), "truck");
         List<Charger> chargers = new ArrayList<>();
         chargers.add(charger);
         chargers.add(charger2);
+        chargers.add(chargert);
+        chargers.add(chargert2);
         new ChargerWriter(chargers).write(folder + "test-chargers.xml");
         List<String> chargingTypes = Arrays.asList(new String[]{"fast", "slow"});
-        ElectricVehicle ev = new ElectricVehicleImpl(Id.create("testEV1", ElectricVehicle.class), new BatteryImpl(30 * EvUnitConversions.J_PER_kWh, 30 * EvUnitConversions.J_PER_kWh), chargingTypes);
+        ElectricVehicle ev = new ElectricVehicleImpl(Id.create("testEV1", ElectricVehicle.class), new BatteryImpl(30 * EvUnitConversions.J_PER_kWh, 30 * EvUnitConversions.J_PER_kWh), chargingTypes, "car");
         new ElectricVehicleWriter(Collections.singletonList(ev)).write(folder + "test_evs.xml");
 
     }
