@@ -36,7 +36,9 @@ import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.EvModule;
 import org.matsim.vsp.ev.charging.*;
 import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.ElectricFleet;
 import org.matsim.vsp.ev.data.file.LTHConsumptionModelReader;
+import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 import org.matsim.vsp.ev.discharging.VehicleTypeSpecificDriveEnergyConsumptionFactory;
 import org.matsim.vsp.ev.routing.EVNetworkRoutingProvider;
@@ -58,12 +60,16 @@ public class RunEVTestscenario {
         driveEnergyConsumptionFactory.addEnergyConsumptionModel("smallCar", new LTHConsumptionModelReader(Id.create("smallCar", VehicleType.class)).readFile("D:/ers/energyconsumption/CityCarMap.csv"));
         driveEnergyConsumptionFactory.addEnergyConsumptionModel("truck", new LTHConsumptionModelReader(Id.create("truck", VehicleType.class)).readFile("D:/ers/energyconsumption/HGV40Map.csv"));
 
+        AuxEnergyConsumption.Factory dummy = electricVehicle -> period -> 0;
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new EvModule());
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
+                bind(ElectricFleet.class).toProvider(VehiclesAsEVFleet.class).asEagerSingleton();
                 bind(DriveEnergyConsumption.Factory.class).toInstance(driveEnergyConsumptionFactory);
+                bind(AuxEnergyConsumption.Factory.class).toInstance(dummy);
                 bind(VehicleChargingHandler.class).asEagerSingleton();
                 addRoutingModuleBinding(TransportMode.car).toProvider(new EVNetworkRoutingProvider(TransportMode.car));
                 bind(ChargingLogic.Factory.class).toInstance(

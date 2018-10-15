@@ -78,9 +78,9 @@ public class GenerateChargersFromGasStations {
             double x = Double.parseDouble(jo.get("lon").toString());
             Coord c = ct.transform(new Coord(x, y));
             Link l = NetworkUtils.getNearestLink(filteredNet, c);
-            Charger fastCharger = new ChargerImpl(Id.create(l.getId().toString() + "fast", Charger.class), 50 * EvUnitConversions.W_PER_kW, 10, l, c, "fast");
+            Charger fastCharger = new ChargerImpl(Id.create(l.getId().toString() + "fast", Charger.class), 80 * EvUnitConversions.W_PER_kW, 10, l, c, "fast");
             chargers.add(fastCharger);
-            Charger truckCharger = new ChargerImpl(Id.create(l.getId().toString() + "truck", Charger.class), 200 * EvUnitConversions.W_PER_kW, 2, l, c, "truck");
+            Charger truckCharger = new ChargerImpl(Id.create(l.getId().toString() + "truck", Charger.class), 1000 * EvUnitConversions.W_PER_kW, 2, l, c, "truck");
             chargers.add(truckCharger);
         }
         new ChargerWriter(chargers).write(folder + "chargers_gasstations.xml");
