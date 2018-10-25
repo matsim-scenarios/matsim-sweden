@@ -44,7 +44,7 @@ public class VehiclesAsEVFleet implements Provider<ElectricFleet> {
     private ElectricFleetImpl electricFleet;
 
     private String truckType = "truck";
-    private double truckCapacity = 400 * EvUnitConversions.J_PER_kWh;
+    private double truckCapacity = 800 * EvUnitConversions.J_PER_kWh;
     private List<String> truckChargers = Collections.singletonList("truck");
 
     private String carType = "smallCar";
