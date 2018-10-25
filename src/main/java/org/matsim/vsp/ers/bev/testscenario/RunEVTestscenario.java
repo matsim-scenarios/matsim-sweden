@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -50,15 +51,15 @@ public class RunEVTestscenario {
     public static void main(String[] args) {
 
 
-        Config config = ConfigUtils.loadConfig("D:/ers/ev-test/config_0.1.xml", new EvConfigGroup());
-
+        Config config = ConfigUtils.loadConfig(args[0], new EvConfigGroup());
         config.transit().setUseTransit(false);
+        config.transit().setUsingTransitInMobsim(false);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Function<Charger, ChargingStrategy> chargingStrategyFactory = charger -> new FixedSpeedChargingStrategy(charger.getPower() * 0.8);
 
         VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
-        driveEnergyConsumptionFactory.addEnergyConsumptionModel("smallCar", new LTHConsumptionModelReader(Id.create("smallCar", VehicleType.class)).readFile("D:/ers/energyconsumption/CityCarMap.csv"));
-        driveEnergyConsumptionFactory.addEnergyConsumptionModel("truck", new LTHConsumptionModelReader(Id.create("truck", VehicleType.class)).readFile("D:/ers/energyconsumption/HGV40Map.csv"));
+        driveEnergyConsumptionFactory.addEnergyConsumptionModel("smallCar", new LTHConsumptionModelReader(Id.create("smallCar", VehicleType.class)).readFile(ConfigGroup.getInputFileURL(config.getContext(), "CityCarMap.csv").getFile()));
+        driveEnergyConsumptionFactory.addEnergyConsumptionModel("truck", new LTHConsumptionModelReader(Id.create("truck", VehicleType.class)).readFile(ConfigGroup.getInputFileURL(config.getContext(), "HGV40Map.csv").getFile()));
 
         AuxEnergyConsumption.Factory dummy = electricVehicle -> period -> 0;
         Controler controler = new Controler(scenario);
@@ -75,9 +76,7 @@ public class RunEVTestscenario {
                 bind(ChargingLogic.Factory.class).toInstance(
                         charger -> new ChargingWithQueueingAndAssignmentLogic(charger, chargingStrategyFactory.apply(charger)));
                 addRoutingModuleBinding(TransportMode.truck).toProvider(new EVNetworkRoutingProvider(TransportMode.truck));
-
                 bindScoringFunctionFactory().to(AgentSpecificASCScoring.class);
-
                 bind(TransitSchedule.class).toInstance(scenario.getTransitSchedule());
             }
         });

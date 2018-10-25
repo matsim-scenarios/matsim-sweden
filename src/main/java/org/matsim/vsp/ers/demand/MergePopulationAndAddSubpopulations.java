@@ -23,9 +23,12 @@ package org.matsim.vsp.ers.demand;/*
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import java.util.Random;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
@@ -45,7 +48,7 @@ public class MergePopulationAndAddSubpopulations {
     public static void main(String[] args) {
         Config config = createConfig();
         final Scenario scenario = createScenario(config);
-
+        Random random = MatsimRandom.getRandom();
         Scenario cscenario = createScenario(config);
         Scenario fscenario = createScenario(config);
         Scenario sscenario = createScenario(config);
@@ -58,8 +61,10 @@ public class MergePopulationAndAddSubpopulations {
 
         cscenario.getPopulation().getPersons().values().forEach(p ->
         {
-            scenario.getPopulation().addPerson(p);
-            scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+            if (random.nextDouble() < 0.5) {
+                scenario.getPopulation().addPerson(p);
+                scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+            }
         });
         stscenario.getPopulation().getPersons().values().forEach(p ->
         {
@@ -73,8 +78,10 @@ public class MergePopulationAndAddSubpopulations {
         });
         sscenario.getPopulation().getPersons().values().forEach(p ->
         {
-            scenario.getPopulation().addPerson(p);
-            scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "longdistance");
+            if (random.nextDouble() < 0.8) {
+                scenario.getPopulation().addPerson(p);
+                scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "longdistance");
+            }
         });
 
         new PopulationWriter(scenario.getPopulation()).write(outputPopulation);
