@@ -6,7 +6,7 @@
 	<groupId>org.matsim.vsp</groupId>
 	<artifactId>ers</artifactId>
 	<version>0.11.0-SNAPSHOT</version>
-	<name>ERS</name>
+	<name>MATSim-Sweden</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
