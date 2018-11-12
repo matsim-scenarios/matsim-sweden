@@ -1,3 +1,5 @@
-# ERS - Electric roads for MATSim
+# MATSim-Sweden
 
-This code hosts the repository for the joint TU Berlin / VSP and University of Lund project on Electric road systems. The project is depending on MATSim and its EV add-on.
+This repository contains an open MATSim scenario of Sweden. The focus in the model is on long-distance travel of cars and trucks.
+
+The model was created using existing models (SAMPERS, SAMGODS) and other input sources (SCB, OSM) and is still a work in progress. 
