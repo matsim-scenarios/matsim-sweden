@@ -129,7 +129,7 @@ public class GenerateSwedenConfig {
         List<String> mainModes = Arrays.asList(new String[]{TransportMode.car, TransportMode.truck});
         config.qsim().setMainModes(mainModes);
         config.plansCalcRoute().setNetworkModes(mainModes);
-        config.travelTimeCalculator().setAnalyzedModes("car,truck");
+        config.travelTimeCalculator().setAnalyzedModesAsString("car,truck");
         config.travelTimeCalculator().setSeparateModes(false);
 
         PlanCalcScoreConfigGroup.ModeParams car = config.planCalcScore().getModes().get(TransportMode.car);
