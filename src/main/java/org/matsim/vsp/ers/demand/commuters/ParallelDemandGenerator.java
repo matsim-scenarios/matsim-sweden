@@ -21,7 +21,7 @@ package org.matsim.vsp.ers.demand.commuters;/*
  * created by jbischoff, 28.08.2018
  */
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
