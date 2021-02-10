@@ -24,6 +24,7 @@ package org.matsim.vsp.ers.demand;/*
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -35,15 +36,15 @@ import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
 public class MergePopulationAndAddSubpopulations {
 
-    private static String commuterDemand = "D:/ers/commuters/commuter_population_0.1.xml.gz";
-    private static String freightDemand = "D:/ers/samgods/samgoodspopulation0.1.xml";
-    private static String sampersDemand = "D:/ers/Sampers/Resultat/sampers_trips_0.07.xml.gz";
-    private static String stockholmPop = "D:/ers/stockholm/stockholm_0.1.xml.gz";
+    private static final String commuterDemand = "D:/ers/commuters/commuter_population_0.1.xml.gz";
+    private static final String freightDemand = "D:/ers/samgods/samgoodspopulation0.1.xml";
+    private static final String sampersDemand = "D:/ers/Sampers/Resultat/sampers_trips_0.07.xml.gz";
+    private static final String stockholmPop = "D:/ers/stockholm/stockholm_0.1.xml.gz";
 
-    private static String outputPopulation = "D:/ers/scenario/merged_population.xml.gz";
-    private static String outputPopulationAttributes = "D:/ers/scenario/merged_population_attributes.xml.gz";
+    private static final String outputPopulation = "D:/ers/scenario/merged_population.xml.gz";
+    private static final String outputPopulationAttributes = "D:/ers/scenario/merged_population_attributes.xml.gz";
 
-
+    public static final String COMMUTERS = "commuters";
 
     public static void main(String[] args) {
         Config config = createConfig();
@@ -63,28 +64,32 @@ public class MergePopulationAndAddSubpopulations {
         {
             if (random.nextDouble() < 0.5) {
                 scenario.getPopulation().addPerson(p);
-                scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+//                scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+                PopulationUtils.putSubpopulation( p, COMMUTERS );
             }
         });
         stscenario.getPopulation().getPersons().values().forEach(p ->
         {
             scenario.getPopulation().addPerson(p);
-            scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+//            scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+            PopulationUtils.putSubpopulation( p, COMMUTERS );
         });
         fscenario.getPopulation().getPersons().values().forEach(p ->
         {
             scenario.getPopulation().addPerson(p);
-            scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "freight");
+//            scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "freight");
+            PopulationUtils.putSubpopulation( p, COMMUTERS );
         });
         sscenario.getPopulation().getPersons().values().forEach(p ->
         {
             if (random.nextDouble() < 0.8) {
                 scenario.getPopulation().addPerson(p);
-                scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "longdistance");
+//                scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "longdistance");
+                PopulationUtils.putSubpopulation( p, COMMUTERS );
             }
         });
 
         new PopulationWriter(scenario.getPopulation()).write(outputPopulation);
-        new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputPopulationAttributes);
+//        new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputPopulationAttributes);
     }
 }

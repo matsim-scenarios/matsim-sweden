@@ -139,7 +139,7 @@ public class CreateLongDistanceDemand {
 
             if (random.nextDouble() < dayReturnProbability) {
                 w.setType(activityType + "_sameday");
-                w.setEndTime(h1.getEndTime() + 6 * 3600 + random.nextInt(10800));
+                w.setEndTime(h1.getEndTime().seconds() + 6 * 3600 + random.nextInt(10800));
                 Leg l2 = f.createLeg(mode);
                 plan.addLeg(l2);
                 Activity h2 = f.createActivityFromCoord("home", homeCoord);

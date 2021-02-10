@@ -95,7 +95,7 @@ public class ParallelDemandGenerator
             Leg l1 = f.createLeg(TransportMode.car);
             plan.addLeg(l1);
             Activity w = f.createActivityFromCoord("work", workCoord);
-            w.setEndTime(h1.getEndTime() + 5 * 3600 + random.nextInt(10800));
+            w.setEndTime(h1.getEndTime().seconds() + 5 * 3600 + random.nextInt(10800));
             plan.addActivity(w);
             Leg l2 = f.createLeg(TransportMode.car);
             plan.addLeg(l2);

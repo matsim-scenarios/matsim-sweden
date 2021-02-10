@@ -35,6 +35,8 @@ public class SwissRailRaptorModuleAsTeleportedMode extends AbstractModule {
             bind(MainModeIdentifier.class).to(IntermodalAwareRouterModeIdentifier.class);
         }
         bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);
+
+        bind( RaptorStopFinder.class ).to( DefaultRaptorStopFinder.class );
     }
 
 

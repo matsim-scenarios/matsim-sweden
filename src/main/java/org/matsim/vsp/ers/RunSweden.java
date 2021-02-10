@@ -54,7 +54,11 @@ public class RunSweden {
                 bind(TransitSchedule.class).toInstance(scenario.getTransitSchedule());
             }
         });
+
         controler.addOverridingModule(new SwissRailRaptorModuleAsTeleportedMode());
+        // yyyy I am not sure if this is a good way of doing it (not using the default execution path, thus always running the risk that it behaves
+        // differently from the default version).  I also think there is (now?) a switch to have pt for routing only, and to teleport it in the
+        // mobsim.  kai, feb'21
 
         controler.run();
     }

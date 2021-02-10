@@ -1,65 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.matsim.vsp</groupId>
 	<artifactId>matsim-sweden</artifactId>
-    <version>12.0-SNAPSHOT</version>
+	<version>12.0-SNAPSHOT</version>
 	<name>MATSim-Sweden</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<matsim.version>12.0</matsim.version>
 	</properties>
 
-
-
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim</artifactId>
-            <version>12.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>analysis</artifactId>
-            <version>12.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>ev</artifactId>
-            <version>12.0-SNAPSHOT</version>
-		</dependency>
-        <dependency>
-            <groupId>org.matsim.vsp.vsp-playgrounds</groupId>
-            <artifactId>vsp</artifactId>
-            <version>12.0-SNAPSHOT</version>
-        </dependency>
-		<dependency>
-			<groupId>com.github.simunto</groupId>
-			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>0.11.0-2018w44</version>
-		</dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geotiff</artifactId>
-            <version>14.0</version>
-        </dependency>
-		<dependency>
-			<groupId>org.matsim.vsp.vsp-playgrounds</groupId>
-			<artifactId>vsp</artifactId>
-			<version>12.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-
-
 	<repositories>
+		<!--Note that in general repositories are not transitive, so they need to be repeated at every level where needed.-->
+		<repository>
+			<!-- Geotools is not on Maven central -->
+			<id>osgeo</id>
+			<name>Geotools repository</name>
+			<!--<url>http://download.osgeo.org/webdav/geotools</url>-->
+			<url>https://repo.osgeo.org/repository/release/</url>
+		</repository>
 		<repository>
 			<id>matsim</id>
 			<url>https://dl.bintray.com/matsim/matsim</url>
@@ -74,24 +36,69 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+<!--		<repository>-->
+<!--			<id>matsim-vsp-vsp-playgrounds</id>-->
+<!--			<url>https://packagecloud.io/matsim-vsp/vsp-playgrounds/maven2</url>-->
+<!--		</repository>-->
+<!--		<repository>-->
+<!--			<id>jitpack.io</id>-->
+<!--			<url>https://jitpack.io</url>-->
+<!--		</repository>-->
+		<!-- for dependencies of osm-network-reader -->
 		<repository>
-            <id>matsim-vsp-vsp-playgrounds</id>
-            <url>https://packagecloud.io/matsim-vsp/vsp-playgrounds/maven2</url>
-        </repository>
-		<repository>
-			<id>osgeo</id>
-			<name>Geotools repository</name>
-			<url>http://download.osgeo.org/webdav/geotools</url>
+			<id>topobyte</id>
+			<url>https://mvn.topobyte.de</url>
 		</repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
+		<!-- for dependencies of osm-network-reader -->
+		<repository>
+			<id>slimjars</id>
+			<url>https://mvn.slimjars.com</url>
+		</repository>
 
-    </repositories>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>analysis</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>ev</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>vsp</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.github.simunto</groupId>-->
+<!--			<artifactId>matsim-sbb-extensions</artifactId>-->
+<!--			<version>0.11.0-2018w44</version>-->
+<!--		</dependency>-->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geotiff</artifactId>
+			<version>14.0</version>
+		</dependency>
+
+	</dependencies>
+
 
 	<build>
-		
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -121,7 +128,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 

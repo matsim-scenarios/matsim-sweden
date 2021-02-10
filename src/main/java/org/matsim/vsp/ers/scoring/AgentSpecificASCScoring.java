@@ -45,7 +45,7 @@ public class AgentSpecificASCScoring implements ScoringFunctionFactory {
 
         // Score activities, legs, payments and being stuck
         // with the default MATSim scoring based on utility parameters in the config file.
-        ScoringParameters.Builder builder = new ScoringParameters.Builder(scenario, person.getId());
+        ScoringParameters.Builder builder = new ScoringParameters.Builder(scenario, person );
 
         Boolean metropolitanAgent = (Boolean) person.getAttributes().getAttribute("metropolitanRegion");
         if (metropolitanAgent != null) {

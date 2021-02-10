@@ -32,6 +32,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.vsp.ers.demand.MergePopulationAndAddSubpopulations;
 
 import java.util.Random;
 
@@ -58,10 +59,12 @@ public class SamplePopulation {
                 p.getSelectedPlan().getPlanElements().stream().filter(Activity.class::isInstance).forEach(a -> ((Activity) a).setLinkId(null));
                 population2.addPerson(p);
 
-                population2.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+//                population2.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "commuters");
+                PopulationUtils.putSubpopulation( p, MergePopulationAndAddSubpopulations.COMMUTERS );
             }
         }
         new PopulationWriter(population2).write(outputPopulation);
-        new ObjectAttributesXmlWriter(population2.getPersonAttributes()).writeFile(outputPopulationAttributes);
+//        new ObjectAttributesXmlWriter(population2.getPersonAttributes()).writeFile(outputPopulationAttributes);
+
     }
 }
