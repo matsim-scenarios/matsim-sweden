@@ -5,16 +5,26 @@
 
 	<groupId>org.matsim.vsp</groupId>
 	<artifactId>matsim-sweden</artifactId>
-	<version>12.0-SNAPSHOT</version>
+	<version>14.0-SNAPSHOT</version>
 	<name>MATSim-Sweden</name>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<matsim.version>12.0</matsim.version>
-	</properties>
+
+		<properties>
+			<matsim.version>14.0-PR1601</matsim.version>
+			<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+			<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+			<maven.compiler.source>11</maven.compiler.source>
+			<maven.compiler.target>11</maven.compiler.target>
+		</properties>
+
 
 	<repositories>
 		<!--Note that in general repositories are not transitive, so they need to be repeated at every level where needed.-->
+		<repository>
+
+		<id>matsim</id>
+			<url>https://repo.matsim.org/repository/matsim</url>
+		</repository>
 		<repository>
 			<!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
@@ -22,28 +32,8 @@
 			<!--<url>http://download.osgeo.org/webdav/geotools</url>-->
 			<url>https://repo.osgeo.org/repository/release/</url>
 		</repository>
-		<repository>
-			<id>matsim</id>
-			<url>https://dl.bintray.com/matsim/matsim</url>
-		</repository>
-		<repository>
-			<id>ojo-snapshots</id>
-			<url>http://oss.jfrog.org/libs-snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-<!--		<repository>-->
-<!--			<id>matsim-vsp-vsp-playgrounds</id>-->
-<!--			<url>https://packagecloud.io/matsim-vsp/vsp-playgrounds/maven2</url>-->
-<!--		</repository>-->
-<!--		<repository>-->
-<!--			<id>jitpack.io</id>-->
-<!--			<url>https://jitpack.io</url>-->
-<!--		</repository>-->
+
+
 		<!-- for dependencies of osm-network-reader -->
 		<repository>
 			<id>topobyte</id>
@@ -54,6 +44,7 @@
 			<id>slimjars</id>
 			<url>https://mvn.slimjars.com</url>
 		</repository>
+
 
 	</repositories>
 
@@ -83,11 +74,6 @@
 			<artifactId>vsp</artifactId>
 			<version>${matsim.version}</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.github.simunto</groupId>-->
-<!--			<artifactId>matsim-sbb-extensions</artifactId>-->
-<!--			<version>0.11.0-2018w44</version>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-geotiff</artifactId>
@@ -100,20 +86,10 @@
 	<build>
 
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
+		<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
+				<version>3.0.0-M4</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
