@@ -28,7 +28,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vsp.ers.ptrouting.SwissRailRaptorModuleAsTeleportedMode;
 import org.matsim.vsp.ers.scoring.AgentSpecificASCScoring;
 
 public class RunSweden {
@@ -43,7 +42,7 @@ public class RunSweden {
             configFile = args[0];
         }
         Config config = ConfigUtils.loadConfig(configFile);
-        config.transit().setUseTransit(false);
+
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         Controler controler = new Controler(scenario);
@@ -55,10 +54,7 @@ public class RunSweden {
             }
         });
 
-        controler.addOverridingModule(new SwissRailRaptorModuleAsTeleportedMode());
-        // yyyy I am not sure if this is a good way of doing it (not using the default execution path, thus always running the risk that it behaves
-        // differently from the default version).  I also think there is (now?) a switch to have pt for routing only, and to teleport it in the
-        // mobsim.  kai, feb'21
+
 
         controler.run();
     }
