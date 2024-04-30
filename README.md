@@ -14,3 +14,6 @@ J. Bischoff, F. J. Márquez-Fernández, G. Domingues-Olavarría, M. Maciejewski 
 A pre-print of the paper is available here:
 https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2019/19-07
 
+## Internal documentation
+
+Please see this Google Doc: https://docs.google.com/document/d/1PqpifF7LZfNBrTgqM12u41lc-EzMY7Kk8V7j1Yh7yeY/edit
